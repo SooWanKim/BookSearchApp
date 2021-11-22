@@ -8,7 +8,7 @@ Unity로 만들었으며 간단한 UI를 제공한다.
 https://api.itbook.store에서 책정보를 얻어와서 UI에 표시해준다.
 ```
 
-![검색정보]](https://github.com/SooWanKim/BookSearchApp/blob/master/BookSearchApp.gif)
+![검색정보](https://github.com/SooWanKim/BookSearchApp/blob/master/BookSearchApp.gif)
 
 
 # 코드 설명
