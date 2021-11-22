@@ -10,7 +10,7 @@ using System.Text;
 
 public class AppManager : Singleton<AppManager>
 {
-    readonly int PagePadingCount = 2;
+    //readonly int PagePadingCount = 2;
     readonly int PagePerCount = 10;
 
     public PreviewUI previewUI;

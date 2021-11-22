@@ -23,10 +23,10 @@ public class PreviewSlotUI : MonoBehaviour
     {
         SetCellInfo(cellIdx);
 
-        if(AppManager.Instance.IsUpdateNextPage(cellIdx) == true)
-        {
-            AppManager.Instance.NextPageSearchBooks();
-        }
+        //if(AppManager.Instance.IsUpdateNextPage(cellIdx) == true)
+        //{
+        //    AppManager.Instance.NextPageSearchBooks();
+        //}
         //Debug.Log($"{cellIdx} + ScrollCellIndex");
     }
 

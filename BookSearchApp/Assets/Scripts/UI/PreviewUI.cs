@@ -27,12 +27,12 @@ public class PreviewUI : MonoBehaviour
 
         _loopScrollRect.verticalNormalizedPosition = 0.001f;
 
-        _loopScrollRectTransform  = _loopScrollRect.GetComponent<RectTransform>();
+        _loopScrollRectTransform = _loopScrollRect.GetComponent<RectTransform>();
     }
 
     public void OnEnterInputText()
     {
-        if(inputField.text.Length > 0)
+        if (inputField.text.Length > 0)
         {
             inputField.enabled = false;
             AppManager.Instance.OnSearchBooks(inputField.text);
@@ -44,6 +44,11 @@ public class PreviewUI : MonoBehaviour
         if (AppManager.Instance.IsSearchingEnd() == true)
         {
             inputField.enabled = true;
+        }
+
+        if (_loopScrollRect.verticalNormalizedPosition >= 1.0f)
+        {
+            AppManager.Instance.NextPageSearchBooks();
         }
     }
 
