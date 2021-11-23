@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -14,15 +14,15 @@ public class AppManager : Singleton<AppManager>
     readonly int PagePerCount = 10;
     readonly int SlotUIImageWidth = 400;
     readonly int SlotUIImageHeight = 450;
-    
+
     public PreviewUI previewUI;
     public DetailPanelUI detailPanelUI;
     public GraphicRaycaster graphicRayCaster;
+    public LoadingCircleUI loadingCircleUI;
     public Text searchResultText;
 
     string _handlerText;
     string _searchText;
-    Texture2D _requestTex2D;
 
     List<JsonSearchBooksData> _searchBooksData = new List<JsonSearchBooksData>();
     public List<JsonSearchBooksData> SearchBooksData { get { return _searchBooksData; } }
@@ -44,11 +44,6 @@ public class AppManager : Singleton<AppManager>
             Screen.SetResolution(600, 800, false);
     }
 
-    private void Start()
-    {
-        //OnSearchBooks("db");
-    }
-
     public void CloseApp()
     {
         Application.Quit();
@@ -62,7 +57,6 @@ public class AppManager : Singleton<AppManager>
         _currentPage = 1;
         _totalCount = 0;
         _filterdCount = 0;
-        //searchResultText?.gameObject.SetActive(false);
     }
 
     public void OnSearchBooks(string text)
@@ -76,12 +70,25 @@ public class AppManager : Singleton<AppManager>
         _currentSearchCoroutine = StartCoroutine(SearchBooks(text, true));
     }
 
-    public void NextPageSearchBooks()
+    public void SearchNextPageBooks()
     {
         if (_currentSearchCoroutine != null)
             return;
 
         _currentSearchCoroutine = StartCoroutine(SearchBooks(_searchText, false));
+    }
+
+    public void OnOpenBookDetail(string isbn)
+    {
+        StartCoroutine(OpenBookDetail(isbn));
+    }
+
+    public bool IsSearchingBooks()
+    {
+        if (_currentSearchCoroutine != null)
+            return true;
+
+        return false;
     }
 
     IEnumerator SearchBooks(string searchText, bool isFirstPage = true)
@@ -90,8 +97,6 @@ public class AppManager : Singleton<AppManager>
 
         if (isFirstPage == true)
         {
-            searchResultText.text = "검색중";
-            searchResultText.gameObject.SetActive(true);
             ClearSearchBook();
 
             if (searchText.Contains("|") == true)
@@ -121,6 +126,7 @@ public class AppManager : Singleton<AppManager>
         {
             if (_totalCount > 0 && (_totalCount <= _currentPage * PagePerCount))
             {
+                ActiveLoadingUI(false);
                 yield break;
             }
             else
@@ -130,6 +136,8 @@ public class AppManager : Singleton<AppManager>
         }
 
         //_searchText = WWW.EscapeURL(_searchText);
+        ActiveLoadingUI(true);
+
         yield return StartCoroutine(GetRequestHandlerText($"https://api.itbook.store/1.0/search/{_searchText}/{_currentPage}"));
 
         JsonSearchData data = GetJsonData<JsonSearchData>();
@@ -137,19 +145,13 @@ public class AppManager : Singleton<AppManager>
         {
             if (data.total == 0)
             {
-                if (isFirstPage == true)
-                {
-                    SetResultEmptyText();
-                }
+                SetResultEmptyText();
 
                 _totalCount = 1;
                 _currentSearchCoroutine = null;
                 previewUI?.UpdateUI(_searchBooksData);
                 yield break;
             }
-
-            searchResultText.text = "갱신중";
-            searchResultText.gameObject.SetActive(true);
 
             _currentPage = data.page;
             _totalCount = data.total;
@@ -194,6 +196,7 @@ public class AppManager : Singleton<AppManager>
             SetResultEmptyText();
         }
 
+        ActiveLoadingUI(false);
         _currentSearchCoroutine = null;
     }
 
@@ -202,13 +205,16 @@ public class AppManager : Singleton<AppManager>
         searchResultText.text = "검색 결과가 존재하지 않습니다.";
         searchResultText.gameObject.SetActive(true);
     }
-    public void OnOpenBookDetail(string isbn)
+
+    private void ActiveLoadingUI(bool active)
     {
-        StartCoroutine(OpenBookDetail(isbn));
+        loadingCircleUI?.gameObject.SetActive(active);
     }
 
     IEnumerator OpenBookDetail(string isbn)
     {
+        ActiveLoadingUI(true);
+
         graphicRayCaster.enabled = false;
 
         yield return StartCoroutine(GetRequestHandlerText($"https://api.itbook.store/1.0/books/{isbn}"));
@@ -216,6 +222,8 @@ public class AppManager : Singleton<AppManager>
         _detailData = GetJsonData<JsonDetailData>();
 
         yield return UpdateDetailBookTexture(_detailData.image, detailPanelUI.bookImage);
+
+        ActiveLoadingUI(false);
 
         detailPanelUI.OnOpen(_detailData);
 
@@ -229,30 +237,6 @@ public class AppManager : Singleton<AppManager>
         var query = data.Where(x => containText.Any(a => x.title.ToLower().Contains(a.ToLower())) && !exceptText.Any(b => x.title.ToLower().Contains(b.ToLower())));
 
         return query.ToList();
-    }
-
-    public bool IsSearchingEnd()
-    {
-        if (_currentSearchCoroutine != null)
-            return false;
-
-        return true;
-    }
-
-    public bool IsUpdateNextPage(int currentCellIndex)
-    {
-        //int waitingCellCount = _searchBooksData.Count - currentCellIndex;
-        //if (waitingCellCount <= PagePadingCount)
-        //{
-        //    return true;
-        //}
-       
-        if(_searchBooksData.Count == currentCellIndex + 1)
-        {
-            return true;
-        }
-
-        return false;
     }
 
     public IEnumerator UpdatePreviewBookTexture(string imageUrl, int i, Image image)
@@ -276,7 +260,7 @@ public class AppManager : Singleton<AppManager>
         }
     }
 
-    public IEnumerator GetTexture(string imageUrl, System.Action<Texture2D> callBack)
+    private IEnumerator GetTexture(string imageUrl, System.Action<Texture2D> callBack)
     {
         UnityWebRequest www = UnityWebRequestTexture.GetTexture(imageUrl);
 
@@ -293,7 +277,7 @@ public class AppManager : Singleton<AppManager>
         }
     }
 
-    public IEnumerator UpdateDetailBookTexture(string imageUrl, Image image)
+    private IEnumerator UpdateDetailBookTexture(string imageUrl, Image image)
     {
         UnityWebRequest www = UnityWebRequestTexture.GetTexture(imageUrl);
 
@@ -313,7 +297,7 @@ public class AppManager : Singleton<AppManager>
         }
     }
 
-    IEnumerator GetRequestHandlerText(string uri)
+    private IEnumerator GetRequestHandlerText(string uri)
     {
         _handlerText = null;
 
@@ -341,16 +325,18 @@ public class AppManager : Singleton<AppManager>
         return JsonConvert.DeserializeObject<T>(_handlerText);
     }
 
-    public static Texture2D ScaleTexture(Texture2D source, int targetWidth, int targetHeight)
+    private Texture2D ScaleTexture(Texture2D source, int targetWidth, int targetHeight)
     {
         Texture2D result = new Texture2D(targetWidth, targetHeight, source.format, false);
         Color[] rpixels = result.GetPixels(0);
         float incX = (1.0f / (float)targetWidth);
         float incY = (1.0f / (float)targetHeight);
+
         for (int px = 0; px < rpixels.Length; px++)
         {
             rpixels[px] = source.GetPixelBilinear(incX * ((float)px % targetWidth), incY * ((float)Mathf.Floor(px / targetWidth)));
         }
+
         result.SetPixels(rpixels, 0);
         result.Apply();
         return result;
