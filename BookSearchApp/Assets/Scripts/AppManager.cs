@@ -12,7 +12,9 @@ public class AppManager : Singleton<AppManager>
 {
     //readonly int PagePadingCount = 2;
     readonly int PagePerCount = 10;
-
+    readonly int SlotUIImageWidth = 400;
+    readonly int SlotUIImageHeight = 450;
+    
     public PreviewUI previewUI;
     public DetailPanelUI detailPanelUI;
     public GraphicRaycaster graphicRayCaster;
@@ -158,7 +160,7 @@ public class AppManager : Singleton<AppManager>
             {
                 yield return StartCoroutine(GetTexture(filteredData[i].image, (tex) =>
                 {
-                    filteredData[i].bookTexture = ScaleTexture(tex, (int)tex.width, (int)tex.height);
+                    filteredData[i].bookTexture = ScaleTexture(tex, SlotUIImageWidth, SlotUIImageHeight);
                 }
                 ));
             }
