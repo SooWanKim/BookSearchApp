@@ -50,7 +50,7 @@ public class PreviewSlotUI : MonoBehaviour
         }
         else
         {
-            _data.bookTexture = AppManager.ScaleTexture(_data.bookTexture, (int)bookImage.rectTransform.sizeDelta.x, (int)bookImage.rectTransform.sizeDelta.y);
+            //_data.bookTexture = AppManager.ScaleTexture(_data.bookTexture, (int)bookImage.rectTransform.sizeDelta.x, (int)bookImage.rectTransform.sizeDelta.y);
             Rect rect = new Rect(0, 0, bookImage.rectTransform.sizeDelta.x, bookImage.rectTransform.sizeDelta.y);
             bookImage.sprite = Sprite.Create(_data.bookTexture, rect, new Vector2(0.5f, 0.5f));
             bookImage.color = new Color(bookImage.color.r, bookImage.color.g, bookImage.color.b, 1.0f);
