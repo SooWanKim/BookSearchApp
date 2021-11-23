@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -41,14 +41,14 @@ public class PreviewUI : MonoBehaviour
 
     void Update()
     {
-        if (AppManager.Instance.IsSearchingEnd() == true)
+        if (AppManager.Instance.IsSearchingBooks() == false)
         {
             inputField.enabled = true;
         }
 
         if (_loopScrollRect.verticalNormalizedPosition >= 1.0f)
         {
-            AppManager.Instance.NextPageSearchBooks();
+            AppManager.Instance.SearchNextPageBooks();
         }
     }
 
