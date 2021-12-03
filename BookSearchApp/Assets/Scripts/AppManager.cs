@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using UnityEngine.UI;
 using System.Linq;
 using System.Web;
-using System.Text;
+
 
 public class AppManager : Singleton<AppManager>
 {
@@ -43,6 +43,17 @@ public class AppManager : Singleton<AppManager>
         if (Application.platform == RuntimePlatform.WindowsPlayer)
             Screen.SetResolution(600, 800, false);
     }
+
+    //private void OnGUI()
+    //{
+    //    if(GUI.Button(new Rect(200, 200, 300, 300), "test")== true)
+    //    {
+    //        string file_path = Application.dataPath + "/json.txt";
+    //        string file_text = System.IO.File.ReadAllText(file_path);
+    //        var api = JsonConvert.DeserializeObject<JsonDetailData>(file_text);
+    //        Debug.Log(api);
+    //    }
+    //}
 
     public void CloseApp()
     {
@@ -220,7 +231,7 @@ public class AppManager : Singleton<AppManager>
         yield return StartCoroutine(GetRequestHandlerText($"https://api.itbook.store/1.0/books/{isbn}"));
 
         _detailData = GetJsonData<JsonDetailData>();
-
+        
         yield return UpdateDetailBookTexture(_detailData.image, detailPanelUI.bookImage);
 
         ActiveLoadingUI(false);

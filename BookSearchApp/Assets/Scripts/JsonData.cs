@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Newtonsoft.Json;
 
 public class JsonSearchData
 {
@@ -37,11 +38,14 @@ public class JsonDetailData
     public string price;
     public string image;
     public string url;
-
-    public IList<JsonPDFData> pdf;
+    public Pdf pdf;
 }
 
-public class JsonPDFData
+public class Pdf
 {
-    public string chapter;
+    [JsonProperty("Chapter 2")]
+    public string Chapter2;
+
+    [JsonProperty("Chapter 5")]
+    public string Chapter5;
 }

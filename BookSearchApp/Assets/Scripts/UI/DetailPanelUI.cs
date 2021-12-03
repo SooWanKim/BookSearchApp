@@ -66,10 +66,16 @@ public class DetailPanelUI : MonoBehaviour
 
         if (_data.pdf != null)
         {
-            pdf.text = "PDF:";
+            pdf.text = "\n";
 
-            foreach (var pdfText in _data.pdf)
-                pdf.text += $"\n{pdfText.chapter}";
+            if (string.IsNullOrEmpty(_data.pdf.Chapter2) == false)
+            {
+                pdf.text += $"PDF : {_data.pdf.Chapter2}";
+            }
+            if (string.IsNullOrEmpty(_data.pdf.Chapter5) == false)
+            {
+                pdf.text += $"\nPDF : {_data.pdf.Chapter5}";
+            }
         }
     }
 
